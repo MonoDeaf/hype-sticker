@@ -1,0 +1,682 @@
+<html><head><base href="/" /><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Album Cover Tag Generator</title><style>
+body {
+    background: #090909;
+    color: #d6dcdc;
+    font-family: system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.outer-container {
+    background: #111111;
+    padding: 20px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 1240px;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 80px);
+}
+
+.artwork-section {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: min(100%, 600px);
+    align-self: center;
+}
+
+.artwork-container {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    background: #111111;
+    margin-bottom: 20px;
+    border: 1px solid #1e1e1e;
+    overflow: hidden;
+}
+
+.artwork {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover !important;
+    background-color: #111111;
+}
+
+.tab-buttons {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    height: 8rem;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #1e1e1e #111111;
+}
+
+.tab-buttons::-webkit-scrollbar {
+    height: 6px;
+}
+
+.tab-buttons::-webkit-scrollbar-track {
+    background: #111111;
+}
+
+.tab-buttons::-webkit-scrollbar-thumb {
+    background-color: #1e1e1e;
+    border-radius: 6px;
+}
+
+.tab-button {
+    flex: 0 0 200px;
+    padding: 15px;
+    background: #111111;
+    border: 1px solid #1e1e1e;
+    color: #d6dcdc;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: 8px;
+}
+
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+        gap: 20px;
+    }
+    
+    .controls {
+        flex: 1;
+        order: 1;
+        overflow-y: auto;
+        max-height: calc(100vh - 80px);
+    }
+    
+    .artwork-section {
+        flex: 1;
+        order: 2;
+        position: sticky;
+        top: 20px;
+    }
+}
+
+.tag-overlay {
+    position: absolute;
+    color: #d6dcdc;
+    padding: 10px;
+    max-width: 200px;
+    transition: all 0.3s ease;
+    bottom: 10px;
+    right: 10px;
+}
+
+.tag-overlay.style2 {
+    width: 100%;
+    max-width: none;
+    height: 50%;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+}
+
+.tag-overlay.style3 {
+    position: absolute;
+    bottom: 10px; /* Position in bottom-right by default */
+    right: 10px;
+    text-align: left;
+    width: 100px;
+    height: 100px;
+    background: #090909;
+    color: #d6dcdc;
+    padding: 20px;
+    border: 1px solid #1e1e1e;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.tag-overlay.style4 {
+    position: absolute;
+    width: 20%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    background: #090909;
+}
+
+.tag-overlay.style4 #recordName {
+    font-size: 64px;
+    line-height: 1;
+    transform: rotate(-90deg) translateX(-50%);
+    transform-origin: 0 0;
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    border-right: 1px solid #202020;
+    white-space: nowrap;
+}
+
+.tag-overlay.style4 #artistName {
+    font-size: 16px;
+    margin-top: auto;
+    opacity: 0.8;
+}
+
+.tag-overlay.style2 .tag-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tag-overlay.style2 .tag-item {
+    border: none;
+    font-size: 24px;
+    padding: 0;
+}
+
+.tag-overlay.style2 #artistName {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.tag-overlay.top-left {
+    top: 10px;
+    left: 10px;
+}
+
+.tag-overlay.top-right {
+    top: 10px;
+    right: 10px;
+}
+
+.tag-overlay.bottom-left {
+    bottom: 10px;
+    left: 10px;
+}
+
+.tag-overlay.bottom-right {
+    bottom: 10px;
+    right: 10px;
+}
+
+.tag-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr;
+    gap: 0;
+}
+
+.tag-item {
+    border: 1px solid #F1F1F1;
+    padding: 6px;
+    font-size: 12px;
+    opacity: .7;
+}
+
+.style3 .tag-item,
+.style4 .tag-item {
+    border: none;
+}
+
+.barcode {
+    display: none;
+    fill: #ffffff;
+}
+
+.tag-overlay:not(.style2):not(.style3):not(.style4):not(.style5) .barcode {
+    display: flex;
+}
+
+.style2 .barcode,
+.style3 .barcode,
+.style4 .barcode,
+.style5 .barcode {
+    display: none;
+}
+
+.controls {
+    margin: 0 0;
+}
+
+input, button, select {
+    margin-bottom: 10px;
+    padding: 12px;
+    width: 100%;
+    background: #111111;
+    border: 1px solid #1e1e1e;
+    color: #d6dcdc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #d6dcdc;
+}
+
+button {
+    background: #111111;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #1e1e1e;
+    border-color: #d6dcdc;
+}
+
+.tab-button.active {
+    background: #1e1e1e;
+    border-color: #d6dcdc;
+}
+
+.style2 .tag-grid,
+.style3 .tag-grid,
+.style4 .tag-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.font-selector {
+    margin-bottom: 10px;
+    padding: 12px;
+    width: 100%;
+    background: #111111;
+    border: 1px solid #1e1e1e;
+    color: #d6dcdc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.font-selector:focus {
+    outline: none;
+    border-color: #d6dcdc;
+}
+
+.text-transform-selector {
+    margin-bottom: 10px;
+    padding: 12px;
+    width: 100%;
+    background: #111111;
+    border: 1px solid #1e1e1e;
+    color: #d6dcdc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.text-transform-selector:focus {
+    outline: none;
+    border-color: #d6dcdc;
+}
+
+.position-selector {
+    display: none; /* Hide by default */
+}
+
+.show-position-selector .position-selector {
+    display: block; /* Show when parent has this class */
+}
+
+#addArtButton {
+    background: #d6dcdc; /* Changed from #111111 */
+    border: 1px solid #1e1e1e;
+    color: #111111; /* Changed from #d6dcdc to provide contrast */
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+#addArtButton:hover {
+    background: #c0c6c6; /* Slightly darker shade for hover */
+}
+
+.tag-overlay.style5 {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    text-align: left;
+    max-width: 200px;
+    background: #d6dcdc;
+    color: #090909;
+    padding: 10px;
+    border-radius: 1px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.style5 .tag-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.style5 .tag-item {
+    border: none;
+}
+
+#downloadBtn {
+    background: #d6dcdc;
+    border: 1px solid #1e1e1e;
+    color: #111111;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+#downloadBtn:hover {
+    background: #c0c6c6;
+    border-color: #1e1e1e;
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.icon-button {
+    background: #111111;
+    border: 1px solid #1e1e1e;
+    padding: 8px; /* Increased padding */
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    transition: all 0.3s ease;
+    width: 100%; /* Make button fill grid cell */
+    height: auto; /* Let height be determined by width */
+    margin: 0; /* Remove margin to be flush */
+}
+
+.icon-button img,
+.icon-button svg {
+    width: 24px; /* Increased icon size */
+    height: 24px;
+    object-fit: contain;
+}
+
+.barcode-icon {
+    width: 24px; /* Increased barcode icon size */
+    height: 24px;
+}
+</style></head><body>
+<div class="outer-container">
+    <div class="container">
+        <div class="controls">
+            <div class="tab-buttons">
+                <button class="tab-button active" data-style="1">Ticket Corner</button>
+                <button class="tab-button" data-style="2">Big Gradient</button>
+                <button class="tab-button" data-style="3">Card Corner</button>
+                <button class="tab-button" data-style="4">Bold Edge</button>
+                <button class="tab-button" data-style="5">Bold Strip</button>
+            </div>
+            <input type="file" id="artworkUpload" accept="image/*" style="display: none;">
+            <button id="addArtButton">Add Art</button>
+            <input type="text" id="artistInput" placeholder="Artist Name">
+            <input type="text" id="recordInput" placeholder="Record Name">
+            <select id="fontSelect" class="font-selector">
+                <option value="system-ui">System UI</option>
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Impact">Impact</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+            </select>
+            <select id="textTransformSelect" class="text-transform-selector">
+                <option value="none">Regular</option>
+                <option value="uppercase">Uppercase</option>
+                <option value="lowercase">Lowercase</option>
+                <option value="capitalize">Capitalize</option>
+            </select>
+            <div class="icon-grid">
+                <button class="icon-button" data-icon="none">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <line x1="4" y1="4" x2="20" y2="20" stroke="#d6dcdc" stroke-width="2"/>
+                        <line x1="20" y1="4" x2="4" y2="20" stroke="#d6dcdc" stroke-width="2"/>
+                    </svg>
+                </button>
+                <button class="icon-button active" data-icon="barcode">
+                    <svg class="barcode-icon" viewBox="0 0 100 40">
+                        <rect x="10" y="5" width="5" height="30"/>
+                        <rect x="20" y="5" width="2" height="30"/>
+                        <rect x="25" y="5" width="5" height="30"/>
+                        <rect x="35" y="5" width="2" height="30"/>
+                        <rect x="40" y="5" width="5" height="30"/>
+                        <rect x="50" y="5" width="2" height="30"/>
+                        <rect x="55" y="5" width="5" height="30"/>
+                        <rect x="65" y="5" width="2" height="30"/>
+                        <rect x="70" y="5" width="5" height="30"/>
+                        <rect x="80" y="5" width="2" height="30"/>
+                        <rect x="85" y="5" width="5" height="30"/>
+                    </svg>
+                </button>
+                <button class="icon-button" data-icon="code">
+                    <img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/Code.svg" alt="Code">
+                </button>
+                <button class="icon-button" data-icon="e1-light">
+                    <img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/E1-D6DCDC.svg" alt="E1 Light">
+                </button>
+                <button class="icon-button" data-icon="e1-orange">
+                    <img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/E1-orange.svg" alt="E1 Orange">
+                </button>
+                <button class="icon-button" data-icon="smile">
+                    <img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/Modular-Smile-orange.svg" alt="Modular Smile">
+                </button>
+                <button class="icon-button" data-icon="frown">
+                    <img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/Modular-Frown-orange.svg" alt="Modular Frown">
+                </button>
+            </div>
+            <select id="positionSelect" class="position-selector">
+                <option value="top-left">Top Left</option>
+                <option value="top-right">Top Right</option>
+                <option value="bottom-left">Bottom Left</option>
+                <option value="bottom-right">Bottom Right</option>
+            </select>
+            <button id="downloadBtn">Download</button>
+        </div>
+        
+        <div class="artwork-section">
+            <div class="artwork-container">
+                <div id="artworkPreview" class="artwork"></div>
+                <div class="tag-overlay bottom-right">
+                    <div class="tag-grid">
+                        <div class="tag-item" id="artistName">Artist Name</div>
+                        <div class="tag-item barcode">
+                            <svg viewBox="0 0 100 40">
+                                <rect x="10" y="5" width="5" height="30"/>
+                                <rect x="20" y="5" width="2" height="30"/>
+                                <rect x="25" y="5" width="5" height="30"/>
+                                <rect x="35" y="5" width="2" height="30"/>
+                                <rect x="40" y="5" width="5" height="30"/>
+                                <rect x="50" y="5" width="2" height="30"/>
+                                <rect x="55" y="5" width="5" height="30"/>
+                                <rect x="65" y="5" width="2" height="30"/>
+                                <rect x="70" y="5" width="5" height="30"/>
+                                <rect x="80" y="5" width="2" height="30"/>
+                                <rect x="85" y="5" width="5" height="30"/>
+                            </svg>
+                        </div>
+                        <div class="tag-item" id="recordName">Record Name</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const artworkPreview = document.getElementById('artworkPreview');
+const artistInput = document.getElementById('artistInput');
+const recordInput = document.getElementById('recordInput');
+const artistName = document.getElementById('artistName');
+const recordName = document.getElementById('recordName');
+const downloadBtn = document.getElementById('downloadBtn');
+const artworkUpload = document.getElementById('artworkUpload');
+const tagOverlay = document.querySelector('.tag-overlay');
+const tabButtons = document.querySelectorAll('.tab-button');
+const fontSelect = document.getElementById('fontSelect');
+const textTransformSelect = document.getElementById('textTransformSelect');
+const addArtButton = document.getElementById('addArtButton');
+const positionSelect = document.getElementById('positionSelect');
+const iconButtons = document.querySelectorAll('.icon-button');
+const barcodeContainer = document.querySelector('.barcode');
+
+// Create icon elements for each custom icon
+const customIcons = {
+    'code': `<img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/Code.svg" alt="Code" style="width:24px; height:24px;">`,
+    'e1-light': `<img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/E1-D6DCDC.svg" alt="E1 Light" style="width:24px; height:24px;">`,
+    'e1-orange': `<img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/E1-orange.svg" alt="E1 Orange" style="width:24px; height:24px;">`,
+    'smile': `<img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/Modular-Smile-orange.svg" alt="Modular Smile" style="width:24px; height:24px;">`,
+    'frown': `<img src="https://raw.githubusercontent.com/MonoDeaf/custom-icons/refs/heads/main/Icons/Modular-Frown-orange.svg" alt="Modular Frown" style="width:24px; height:24px;">`,
+    'barcode': barcodeContainer.innerHTML,
+    'none': ''  // Empty string for no icon
+};
+
+let currentStyle = 1;
+
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const style = parseInt(button.dataset.style);
+        currentStyle = style;
+        
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        let className = '';
+        if (style === 1 || style === 3) {
+            const position = positionSelect.value;
+            className = `tag-overlay ${style === 3 ? 'style3' : ''} ${position}`;
+        } else if (style === 2) {
+            className = 'tag-overlay style2';
+        } else if (style === 4) {
+            className = 'tag-overlay style4';
+        } else if (style === 5) {
+            className = 'tag-overlay style5';
+        }
+        
+        tagOverlay.className = className;
+
+        // Toggle position selector visibility
+        const controls = document.querySelector('.controls');
+        if (style === 1 || style === 3) {
+            controls.classList.add('show-position-selector');
+        } else {
+            controls.classList.remove('show-position-selector');
+        }
+    });
+});
+
+// Set initial visibility based on default style (style 1)
+document.querySelector('.controls').classList.add('show-position-selector');
+
+artworkUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            artworkPreview.style.backgroundImage = `url(${e.target.result})`;
+            artworkPreview.style.backgroundSize = 'contain';
+            artworkPreview.style.backgroundPosition = 'center';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+artistInput.addEventListener('input', (e) => {
+    artistName.textContent = e.target.value || 'Artist Name';
+});
+
+recordInput.addEventListener('input', (e) => {
+    recordName.textContent = e.target.value || 'Record Name';
+});
+
+fontSelect.addEventListener('change', (e) => {
+    const selectedFont = e.target.value;
+    tagOverlay.style.fontFamily = selectedFont;
+});
+
+textTransformSelect.addEventListener('change', (e) => {
+    const selectedTransform = e.target.value;
+    tagOverlay.style.textTransform = selectedTransform;
+});
+
+positionSelect.addEventListener('change', (e) => {
+    const position = e.target.value;
+    if (currentStyle === 1 || currentStyle === 3) {
+        tagOverlay.className = `tag-overlay ${currentStyle === 3 ? 'style3' : ''} ${position}`;
+    }
+});
+
+addArtButton.addEventListener('click', () => {
+    artworkUpload.click();
+});
+
+downloadBtn.addEventListener('click', () => {
+    const artworkContainer = document.querySelector('.artwork-container');
+    
+    htmlToImage.toPng(artworkContainer)
+        .then(function (dataUrl) {
+            const link = document.createElement('a');
+            link.download = '[BCC]-tagged-artwork.png';
+            link.href = dataUrl;
+            link.click();
+        })
+        .catch(function (error) {
+            console.error('Error generating image:', error);
+        });
+});
+
+iconButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        iconButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        const iconType = button.dataset.icon;
+        
+        if (iconType === 'none') {
+            barcodeContainer.style.display = 'none';
+            barcodeContainer.innerHTML = '';
+        } else {
+            barcodeContainer.innerHTML = customIcons[iconType];
+            barcodeContainer.style.display = iconType === 'barcode' ? 'flex' : 'block';
+        }
+    });
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+</body></html>
